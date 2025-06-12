@@ -44,7 +44,7 @@ export default function ProfileScreen() {
               </div>
             </div>
             <h2 className="text-lg font-semibold text-gray-900">Full Name</h2>
-            <p className="text-sm text-gray-500">@username</p>
+            <p className="text-sm text-gray-500">@email</p>
           </div>
 
           {/* Menu Items */}

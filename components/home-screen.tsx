@@ -7,7 +7,15 @@ import { Progress } from "@/components/ui/progress"
 import { Bell, Leaf, ChevronRight, Car, Zap, Home, BarChart3, Plus, Award, User } from "lucide-react"
 import Link from "next/link"
 
+import { useQuery } from '@tanstack/react-query'
+import { getUsers } from '@/lib/api'
+
+
 export default function HomeScreen() {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['users'],
+    queryFn: getUsers,
+  })
   const [activeTab, setActiveTab] = useState("home")
 
   const activities = [

@@ -17,7 +17,7 @@ export default function RegistrationScreen() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    username: "",
+    email: "",
     password: "",
     confirmPassword: "",
   })
@@ -39,7 +39,7 @@ export default function RegistrationScreen() {
       return
     }
 
-    if (!formData.fullName || !formData.email || !formData.username || !formData.password) {
+    if (!formData.fullName || !formData.email || !formData.email || !formData.password) {
       alert("Please fill in all fields!")
       setIsLoading(false)
       return
@@ -113,15 +113,15 @@ export default function RegistrationScreen() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-gray-600 font-medium">
-              Username
+            <Label htmlFor="email" className="text-gray-600 font-medium">
+              Email
             </Label>
             <Input
-              id="username"
+              id="email"
               type="text"
-              placeholder="Create a username"
-              value={formData.username}
-              onChange={(e) => handleInputChange("username", e.target.value)}
+              placeholder="Create a email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
               disabled={isLoading}
             />

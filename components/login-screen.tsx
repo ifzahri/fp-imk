@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -8,13 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { loginUser } from "@/lib/api"
 
 export default function LoginScreen() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   })
 
@@ -25,43 +27,23 @@ export default function LoginScreen() {
     }))
   }
 
-  const handleLogin = async () => {
-    setIsLoading(true)
-
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Here you would make an API call to your Golang backend
-    console.log("Login data:", formData)
-
-    try {
-      // Example API call structure:
-      // const response = await fetch('http://your-golang-api.com/api/login', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(formData),
-      // })
-      // const result = await response.json()
-
-      // For now, simulate successful login
-      if (formData.username && formData.password) {
-        // Store user session/token here if needed
-        // localStorage.setItem('token', result.token)
-
-        // Redirect to home page
-        router.push("/home")
-      } else {
-        alert("Please fill in all fields")
-      }
-    } catch (error) {
-      console.error("Login failed:", error)
-      alert("Login failed. Please try again.")
-    } finally {
-      setIsLoading(false)
+const handleLogin = async () => {
+  setIsLoading(true)
+  try {
+    const result = await loginUser(formData.email, formData.password)
+    if (result.status) {
+      localStorage.setItem('token', result.data.token)
+      router.push("/home")
+    } else {
+      alert(result.message)
     }
+  } catch (error: any) {
+    alert(error?.response?.data?.message || "Login failed.")
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   const handleGoogleLogin = () => {
     // Implement Google OAuth login
@@ -81,15 +63,15 @@ export default function LoginScreen() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-gray-600 font-medium">
-              Username
+            <Label htmlFor="email" className="text-gray-600 font-medium">
+              Email
             </Label>
             <Input
-              id="username"
+              id="email"
               type="text"
-              placeholder="Your username"
-              value={formData.username}
-              onChange={(e) => handleInputChange("username", e.target.value)}
+              placeholder="Your email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
               disabled={isLoading}
             />
