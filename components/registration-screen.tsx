@@ -18,6 +18,7 @@ export default function RegistrationScreen() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    telp_number: "",
     password: "",
     confirmPassword: "",
   })
@@ -46,7 +47,7 @@ export default function RegistrationScreen() {
     }
 
     try {
-      const result = await registerUser(formData.name, formData.email, formData.password);
+      const result = await registerUser(formData.name, formData.email, formData.password, formData.telp_number);
       if (result.status) {
         alert("Registration successful! Please log in.");
         router.push("/login");
@@ -99,15 +100,15 @@ export default function RegistrationScreen() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-600 font-medium">
-              Email
+            <Label htmlFor="telp_number" className="text-gray-600 font-medium">
+              Telephone Number
             </Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="Your email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
+              id="telp_number"
+              type="tel"
+              placeholder="Your telephone number"
+              value={formData.telp_number}
+              onChange={(e) => handleInputChange("telp_number", e.target.value)}
               className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
               disabled={isLoading}
             />
