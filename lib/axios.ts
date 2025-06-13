@@ -9,12 +9,22 @@ const api = axios.create({
 
 // Request Interceptor
 api.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  if (typeof window !== 'undefined') {
+    const authStorageItem = localStorage.getItem('auth-storage'); // Zustand store name
+    if (authStorageItem) {
+      try {
+        const authState = JSON.parse(authStorageItem);
+        const token = authState?.state?.token; // Access token from {state: {token: ...}} structure
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (e) {
+        console.error("Error parsing auth-storage from localStorage:", e);
+      }
+    }
   }
-  return config
-})
+  return config;
+});
 
 // Response Interceptor
 api.interceptors.response.use(

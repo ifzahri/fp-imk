@@ -8,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Car, Zap, UtensilsCrossed, Calendar, Home, BarChart3, Plus, Award, User } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { addCarbonEntry, CarbonEntryData } from "@/lib/api";
 
 export default function AddCarbonScreen() {
   const router = useRouter()
+  const [isSaving, setIsSaving] = useState(false);
   const [activeCategory, setActiveCategory] = useState("vehicle")
   const [formData, setFormData] = useState({
     vehicleType: "Car",
@@ -36,11 +38,31 @@ export default function AddCarbonScreen() {
     }))
   }
 
-  const handleSaveEntry = () => {
-    console.log("Saving entry:", { category: activeCategory, ...formData })
-    // Save to backend here
-    router.push("/home")
-  }
+  const handleSaveEntry = async () => {
+    setIsSaving(true);
+    try {
+      // Ensure formData matches the expected structure for the activeCategory
+      // The CarbonEntryData interface might need to be more flexible or specific per category
+      const entryData: CarbonEntryData = {
+        category: activeCategory,
+        ...formData,
+        distance: formData.distance ? parseFloat(formData.distance) : undefined, // Ensure distance is a number if present
+      };
+
+      const result = await addCarbonEntry(entryData);
+      if (result.status) {
+        alert(result.message); // Or use a more sophisticated notification
+        router.push("/home");
+      } else {
+        alert(result.message || "Failed to save carbon entry.");
+      }
+    } catch (error: any) {
+      console.error("Failed to save carbon entry:", error);
+      alert(error?.response?.data?.message || "An error occurred while saving the entry.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -181,9 +203,10 @@ export default function AddCarbonScreen() {
           {/* Save Button */}
           <Button
             onClick={handleSaveEntry}
+            disabled={isSaving} // Disable when saving
             className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-base mt-8"
           >
-            Save Entry
+            {isSaving ? "Saving..." : "Save Entry"}
           </Button>
         </div>
       </div>

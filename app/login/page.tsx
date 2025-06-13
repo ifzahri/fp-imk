@@ -1,5 +1,6 @@
-import LoginScreen from "@/components/login-screen"
+"use client"
 
-export default function LoginPage() {
-  return <LoginScreen />
-}
+import { withAuth } from "@/hooks/with-auth";
+import LoginScreen from "@/components/login-screen";
+
+export default withAuth(LoginScreen, { requireAuth: false, redirectTo: '/home' });

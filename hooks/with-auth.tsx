@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/stores/store'
+import { useAuthStore } from '@/stores/auth'
 
 interface WithAuthOptions {
   redirectTo?: string

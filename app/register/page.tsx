@@ -1,5 +1,6 @@
-import RegistrationScreen from "@/components/registration-screen"
+"use client"
 
-export default function RegisterPage() {
-  return <RegistrationScreen />
-}
+import { withAuth } from "@/hooks/with-auth";
+import RegistrationScreen from "@/components/registration-screen";
+
+export default withAuth(RegistrationScreen, { requireAuth: false, redirectTo: '/home' });

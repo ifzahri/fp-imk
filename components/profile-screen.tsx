@@ -3,8 +3,46 @@
 import { Button } from "@/components/ui/button"
 import { Home, BarChart3, Plus, Award, User, ChevronRight, Camera, LogOut } from "lucide-react"
 import Link from "next/link"
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getCurrentUserProfile } from "@/lib/api";
 
 export default function ProfileScreen() {
+  const { user, setUser, isAuthenticated, logout } = useAuthStore();
+  const router = useRouter();
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (isAuthenticated && !user) {
+        setProfileError(null); // Clear previous errors
+        setIsLoadingProfile(true);
+        try {
+          const profileData = await getCurrentUserProfile();
+          if (profileData && profileData.data) {
+            setUser(profileData.data);
+          } else if (profileData) {
+            setUser(profileData);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user profile:", error);
+          setProfileError("Could not load your profile. Please try refreshing the page.");
+        } finally {
+          setIsLoadingProfile(false);
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [isAuthenticated, user, setUser]);
+
   const menuItems = [
     { label: "Edit Profile", icon: ChevronRight },
     { label: "Display", icon: ChevronRight },
@@ -43,8 +81,15 @@ export default function ProfileScreen() {
                 </div>
               </div>
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Full Name</h2>
-            <p className="text-sm text-gray-500">@email</p>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {isLoadingProfile ? 'Loading...' : user ? user.name : 'N/A'}
+            </h2>
+            <p className="text-sm text-gray-500">
+              {isLoadingProfile ? 'Loading...' : user ? user.email : 'N/A'}
+            </p>
+            {profileError && !isLoadingProfile && (
+              <p className="text-sm text-red-500 mt-2">{profileError}</p>
+            )}
           </div>
 
           {/* Menu Items */}
@@ -61,13 +106,14 @@ export default function ProfileScreen() {
           </div>
 
           {/* Logout Button */}
-          <Link href="/login" passHref>
-            <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg flex items-center justify-center gap-2">
-              <LogOut className="h-4 w-4" />
-              Log Out
-            </Button>
-            <br></br>
-          </Link>
+          <Button
+            type="button"
+            onClick={handleLogout}
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg flex items-center justify-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Log Out
+          </Button>
         </div>
 
         {/* Navigation Bar */}

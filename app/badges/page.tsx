@@ -1,5 +1,6 @@
-import BadgesScreen from "@/components/badges-screen"
+"use client"
 
-export default function BadgesPage() {
-  return <BadgesScreen />
-}
+import { withAuth } from "@/hooks/with-auth";
+import BadgesScreen from "@/components/badges-screen";
+
+export default withAuth(BadgesScreen);

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { registerUser } from "@/lib/api"
 
 export default function RegistrationScreen() {
   const router = useRouter()
@@ -15,8 +16,7 @@ export default function RegistrationScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -39,37 +39,23 @@ export default function RegistrationScreen() {
       return
     }
 
-    if (!formData.fullName || !formData.email || !formData.email || !formData.password) {
+    if (!formData.name || !formData.email || !formData.password) {
       alert("Please fill in all fields!")
       setIsLoading(false)
       return
     }
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
     try {
-      // Here you would make an API call to your Golang backend
-      console.log("Registration data:", formData)
-
-      // Example API call structure:
-      // const response = await fetch('http://your-golang-api.com/api/register', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(formData),
-      // })
-      // const result = await response.json()
-
-      // For now, simulate successful registration
-      alert("Registration successful! Welcome to JejaKarbon!")
-
-      // Redirect to home page after successful registration
-      router.push("/home")
-    } catch (error) {
-      console.error("Registration failed:", error)
-      alert("Registration failed. Please try again.")
+      const result = await registerUser(formData.name, formData.email, formData.password);
+      if (result.status) {
+        alert("Registration successful! Please log in.");
+        router.push("/login");
+      } else {
+        alert(result.message || "Registration failed.");
+      }
+    } catch (error: any) {
+      console.error("Registration failed:", error);
+      alert(error?.response?.data?.message || "An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false)
     }
@@ -83,15 +69,15 @@ export default function RegistrationScreen() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="fullName" className="text-gray-600 font-medium">
-              Full Name
+            <Label htmlFor="name" className="text-gray-600 font-medium">
+              Name
             </Label>
             <Input
-              id="fullName"
+              id="name"
               type="text"
-              placeholder="Your full name"
-              value={formData.fullName}
-              onChange={(e) => handleInputChange("fullName", e.target.value)}
+              placeholder="Your name"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
               className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
               disabled={isLoading}
             />
@@ -118,8 +104,8 @@ export default function RegistrationScreen() {
             </Label>
             <Input
               id="email"
-              type="text"
-              placeholder="Create a email"
+              type="email"
+              placeholder="Your email"
               value={formData.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
               className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"

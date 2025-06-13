@@ -10,9 +10,11 @@ import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { loginUser } from "@/lib/api"
+import { useAuthStore } from "@/stores/auth"
 
 export default function LoginScreen() {
   const router = useRouter()
+  const setAuth = useAuthStore((state) => state.setAuth)
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -32,7 +34,7 @@ const handleLogin = async () => {
   try {
     const result = await loginUser(formData.email, formData.password)
     if (result.status) {
-      localStorage.setItem('token', result.data.token)
+      setAuth({ token: result.data.token, role: result.data.role, user: result.data.user })
       router.push("/home")
     } else {
       alert(result.message)

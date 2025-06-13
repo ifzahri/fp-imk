@@ -1,5 +1,6 @@
-import HomeScreen from "@/components/home-screen"
+"use client"
 
-export default function HomePage() {
-  return <HomeScreen />
-}
+import { withAuth } from "@/hooks/with-auth";
+import HomeScreen from "@/components/home-screen";
+
+export default withAuth(HomeScreen);

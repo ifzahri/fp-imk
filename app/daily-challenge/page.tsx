@@ -1,5 +1,6 @@
-import DailyChallengeScreen from "@/components/daily-challenge-screen"
+"use client"
 
-export default function DailyChallengePage() {
-  return <DailyChallengeScreen />
-}
+import { withAuth } from "@/hooks/with-auth";
+import DailyChallengeScreen from "@/components/daily-challenge-screen";
+
+export default withAuth(DailyChallengeScreen);
