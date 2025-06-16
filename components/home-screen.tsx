@@ -1,17 +1,14 @@
 "use client"
 
-import { useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Bell, Leaf, ChevronRight, Car, Zap, Home, BarChart3, Plus, Award, User } from "lucide-react"
 import Link from "next/link"
-import { useAuthStore } from '@/stores/auth';
 
 
 export default function HomeScreen() {
-  const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState("home")
 
   const activities = [
     { type: "car", icon: Car, label: "Car Usage", detail: "15 km driven", impact: "+1.2 kg", color: "text-red-500" },

@@ -31,13 +31,7 @@ export interface CarbonEntryData {
   // ... add other fields if electronics/food forms were defined
 }
 
-export const addCarbonEntry = async (entryData: CarbonEntryData) => {
-  // Replace with actual API call:
-  // const response = await api.post('/carbon-entries', entryData);
-  // return response.data;
-
-  console.log("Placeholder: Adding carbon entry to backend", entryData);
-  // Simulate a successful response for now
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-  return { status: true, message: "Carbon entry added successfully (placeholder)", data: entryData };
+export const addCarbonEntry = async (entryData: any) => { // Use any for entryData as the structure is now custom
+  const response = await api.post('/activity', entryData); // Corrected endpoint
+  return response.data;
 };

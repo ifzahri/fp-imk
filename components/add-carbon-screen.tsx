@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Car, Zap, UtensilsCrossed, Calendar, Home, BarChart3, Plus, Award, User } from "lucide-react"
-import Link from "next/link"
+import { ArrowLeft, Car, Zap, UtensilsCrossed, Calendar } from "lucide-react" // Removed unused imports
 import { useRouter } from "next/navigation"
-import { addCarbonEntry, CarbonEntryData } from "@/lib/api";
+import { addCarbonEntry } from "@/lib/api"; // Removed unused CarbonEntryData import
+import { getUserIdFromJwt } from "@/lib/utils"; // Assuming this helper exists
 
 export default function AddCarbonScreen() {
   const router = useRouter()
@@ -20,6 +20,7 @@ export default function AddCarbonScreen() {
     distance: "",
     date: "",
     notes: "",
+    deskripsi: "", // Added deskripsi field
   })
 
   const categories = [
@@ -41,13 +42,32 @@ export default function AddCarbonScreen() {
   const handleSaveEntry = async () => {
     setIsSaving(true);
     try {
-      // Ensure formData matches the expected structure for the activeCategory
-      // The CarbonEntryData interface might need to be more flexible or specific per category
-      const entryData: CarbonEntryData = {
-        category: activeCategory,
-        ...formData,
-        distance: formData.distance ? parseFloat(formData.distance) : undefined, // Ensure distance is a number if present
-      };
+      const userId = getUserIdFromJwt(); // Get user ID from JWT
+
+      if (!userId) {
+        alert("User not authenticated.");
+        setIsSaving(false);
+        return;
+      }
+
+      let entryData: any; // TODO: Refine type later
+
+      if (activeCategory === "vehicle") {
+        entryData = {
+          user_id: userId,
+          source: "vehicle",
+          deskripsi: formData.deskripsi, // Use value from form data
+          vehicle_details: {
+            fuel_type: formData.fuelType,
+            distance: formData.distance ? parseFloat(formData.distance) : 0, // Ensure distance is a number
+          },
+        };
+      } else {
+        // Handle other categories if needed in the future
+        alert("Saving for this category is not yet implemented with the new structure.");
+        setIsSaving(false);
+        return;
+      }
 
       const result = await addCarbonEntry(entryData);
       if (result.status) {
@@ -56,7 +76,7 @@ export default function AddCarbonScreen() {
       } else {
         alert(result.message || "Failed to save carbon entry.");
       }
-    } catch (error: any) {
+    } catch (error: any) { // TODO: Refine error type
       console.error("Failed to save carbon entry:", error);
       alert(error?.response?.data?.message || "An error occurred while saving the entry.");
     } finally {
@@ -178,6 +198,20 @@ export default function AddCarbonScreen() {
                   placeholder="Add any additional notes..."
                   value={formData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
+                  className="min-h-[80px] border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500 resize-none"
+                />
+              </div>
+
+              {/* Description Field */}
+              <div className="space-y-2">
+                <Label htmlFor="deskripsi" className="text-gray-700 font-medium">
+                  Description
+                </Label>
+                <Textarea
+                  id="deskripsi"
+                  placeholder="e.g., Daily commute to work"
+                  value={formData.deskripsi}
+                  onChange={(e) => handleInputChange("deskripsi", e.target.value)}
                   className="min-h-[80px] border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500 resize-none"
                 />
               </div>
