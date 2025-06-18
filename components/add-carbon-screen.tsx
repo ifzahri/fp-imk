@@ -20,7 +20,11 @@ export default function AddCarbonScreen() {
     distance: "",
     date: "",
     notes: "",
-    deskripsi: "", // Added deskripsi field
+    deskripsi: "",
+    electronicsItem: "",
+    durationUsage: "",
+    foodItem: "",
+    weight: "",
   })
 
   const categories = [
@@ -56,15 +60,58 @@ export default function AddCarbonScreen() {
         entryData = {
           user_id: userId,
           source: "vehicle",
-          deskripsi: formData.deskripsi, // Use value from form data
+          deskripsi: formData.deskripsi,
           vehicle_details: {
             fuel_type: formData.fuelType,
-            distance: formData.distance ? parseFloat(formData.distance) : 0, // Ensure distance is a number
+            distance: formData.distance ? parseFloat(formData.distance) : 0,
           },
+          electrical_details: {
+            item: "",
+            duration_usage: 0
+          },
+          food_details: {
+            food_item: "",
+            weight: 0
+          }
+        };
+      } else if (activeCategory === "electronics") {
+        entryData = {
+          user_id: userId,
+          source: "electronics",
+          deskripsi: formData.deskripsi,
+          electrical_details: {
+            item: formData.electronicsItem,
+            duration_usage: formData.durationUsage ? parseFloat(formData.durationUsage) : 0,
+          },
+          vehicle_details: {
+            fuel_type: "",
+            distance: 0
+          },
+          food_details: {
+            food_item: "",
+            weight: 0
+          }
+        };
+      } else if (activeCategory === "food") {
+        entryData = {
+          user_id: userId,
+          source: "food",
+          deskripsi: formData.deskripsi,
+          food_details: {
+            food_item: formData.foodItem,
+            weight: formData.weight ? parseFloat(formData.weight) : 0,
+          },
+          vehicle_details: {
+            fuel_type: "",
+            distance: 0
+          },
+          electrical_details: {
+            item: "",
+            duration_usage: 0
+          }
         };
       } else {
-        // Handle other categories if needed in the future
-        alert("Saving for this category is not yet implemented with the new structure.");
+        alert("Invalid category selected.");
         setIsSaving(false);
         return;
       }
@@ -218,19 +265,97 @@ export default function AddCarbonScreen() {
             </div>
           )}
 
-          {/* Electronics Form Placeholder */}
+          {/* Electronics Form */}
           {activeCategory === "electronics" && (
-            <div className="text-center py-8 text-gray-500">
-              <Zap className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>Electronics tracking form coming soon!</p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="electronicsItem" className="text-gray-700 font-medium">
+                  Item
+                </Label>
+                <Input
+                  id="electronicsItem"
+                  type="text"
+                  placeholder="e.g., Laptop, Refrigerator"
+                  value={formData.electronicsItem}
+                  onChange={(e) => handleInputChange("electronicsItem", e.target.value)}
+                  className="h-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="durationUsage" className="text-gray-700 font-medium">
+                  Duration Usage (hours)
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="durationUsage"
+                    type="number"
+                    placeholder="0"
+                    value={formData.durationUsage}
+                    onChange={(e) => handleInputChange("durationUsage", e.target.value)}
+                    className="h-12 pr-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">hours</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="deskripsi" className="text-gray-700 font-medium">
+                  Description
+                </Label>
+                <Textarea
+                  id="deskripsi"
+                  placeholder="e.g., Using laptop for work"
+                  value={formData.deskripsi}
+                  onChange={(e) => handleInputChange("deskripsi", e.target.value)}
+                  className="min-h-[80px] border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500 resize-none"
+                />
+              </div>
             </div>
           )}
 
-          {/* Food Form Placeholder */}
+          {/* Food Form */}
           {activeCategory === "food" && (
-            <div className="text-center py-8 text-gray-500">
-              <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>Food tracking form coming soon!</p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="foodItem" className="text-gray-700 font-medium">
+                  Food Item
+                </Label>
+                <Input
+                  id="foodItem"
+                  type="text"
+                  placeholder="e.g., Organic, Meat, Dairy"
+                  value={formData.foodItem}
+                  onChange={(e) => handleInputChange("foodItem", e.target.value)}
+                  className="h-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="weight" className="text-gray-700 font-medium">
+                  Weight (kg)
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="weight"
+                    type="number"
+                    placeholder="0.0"
+                    value={formData.weight}
+                    onChange={(e) => handleInputChange("weight", e.target.value)}
+                    className="h-12 pr-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">kg</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="deskripsi" className="text-gray-700 font-medium">
+                  Description
+                </Label>
+                <Textarea
+                  id="deskripsi"
+                  placeholder="e.g., Disposing weekly organic waste"
+                  value={formData.deskripsi}
+                  onChange={(e) => handleInputChange("deskripsi", e.target.value)}
+                  className="min-h-[80px] border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500 resize-none"
+                />
+              </div>
             </div>
           )}
 

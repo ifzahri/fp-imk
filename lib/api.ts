@@ -2,7 +2,7 @@
 import api from './axios'
 
 export const loginUser = async (email: string, password: string) => {
-  const response = await api.post('/user/login', { email, password })
+  const response = await api.post('/user/login/', { email, password })
   return response.data
 }
 
@@ -17,7 +17,7 @@ export const getUsers = async () => {
 }
 
 export const getCurrentUserProfile = async () => {
-  const response = await api.get('/user/me');
+  const response = await api.get('/user/me/');
   return response.data; // Or response.data.data if it's doubly wrapped
 };
 
