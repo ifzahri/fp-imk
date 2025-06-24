@@ -1,11 +1,10 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://43.156.7.3/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8888/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  // withCredentials: true, // Added to potentially help with CORS
 })
 
 // Request Interceptor

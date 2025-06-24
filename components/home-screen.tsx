@@ -1,21 +1,81 @@
 "use client"
 
-
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Bell, Leaf, ChevronRight, Car, Zap, Home, BarChart3, Plus, Award, User } from "lucide-react"
+import { Bell, Leaf, ChevronRight, Car, Zap, Home, BarChart3, Plus, Award, User, UtensilsCrossed } from "lucide-react"
 import Link from "next/link"
-
+import { getCarbonDashboard, getActivitiesByUser, getUserDailyChallenge } from "@/lib/api"
+import { getUserIdFromJwt } from "@/lib/utils"
+import { CarbonDashboardResponse, ActivityResponse, UserChallengeResponse } from "@/types/types"
 
 export default function HomeScreen() {
+  const [dashboardData, setDashboardData] = useState<CarbonDashboardResponse | null>(null)
+  const [activities, setActivities] = useState<ActivityResponse[]>([])
+  const [dailyChallenge, setDailyChallenge] = useState<UserChallengeResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const activities = [
-    { type: "car", icon: Car, label: "Car Usage", detail: "15 km driven", impact: "+1.2 kg", color: "text-red-500" },
-    { type: "electricity", icon: Zap, label: "Electricity", detail: "4.5 kWh used", impact: "+0.8 kg", color: "text-yellow-500" },
-    { type: "car", icon: Car, label: "Car Usage", detail: "18 km driven", impact: "+1.5 kg", color: "text-red-500" },
-    { type: "electricity", icon: Zap, label: "Electricity", detail: "5.2 kWh used", impact: "+1.2 kg", color: "text-yellow-500" },
-  ]
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true)
+        
+        // Fetch dashboard data
+        const dashResult = await getCarbonDashboard()
+        if (dashResult.status) {
+          setDashboardData(dashResult.data)
+        }
+
+        // Fetch user activities
+        const userId = getUserIdFromJwt()
+        if (userId) {
+          const activitiesResult = await getActivitiesByUser(userId)
+          if (activitiesResult.status) {
+            setActivities(activitiesResult.data.slice(0, 4)) // Show only recent 4 activities
+          }
+        }
+
+        // Fetch daily challenge
+        try {
+          const challengeResult = await getUserDailyChallenge()
+          if (challengeResult.status) {
+            setDailyChallenge(challengeResult.data)
+          }
+        } catch (challengeError) {
+          // Daily challenge might not exist, that's okay
+          console.log("No daily challenge found")
+        }
+
+      } catch (err: any) {
+        setError(err?.response?.data?.message || "Failed to load data")
+        console.error("Home screen data fetch error:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  const getActivityIcon = (source: string) => {
+    switch (source) {
+      case 'vehicle': return Car
+      case 'electronics': return Zap
+      case 'food': return UtensilsCrossed
+      default: return Car
+    }
+  }
+
+  const getActivityColor = (source: string) => {
+    switch (source) {
+      case 'vehicle': return "text-red-500"
+      case 'electronics': return "text-yellow-500"
+      case 'food': return "text-green-500"
+      default: return "text-gray-500"
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -46,11 +106,16 @@ export default function HomeScreen() {
               </div>
               <div className="space-y-1">
                 <div className="text-2xl font-bold">
-                  2.4 kg CO<sub className="text-lg">2</sub>
+                  {isLoading ? "Loading..." : dashboardData ? 
+                    `${dashboardData.daily_average?.value?.toFixed(1) || "0.0"} kg CO` : 
+                    "0.0 kg CO"
+                  }<sub className="text-lg">2</sub>
                 </div>
                 <div className="flex items-center text-sm opacity-90">
-                  <span className="mr-1">↓</span>
-                  12% less than yesterday
+                  <span className="mr-1">
+                    {dashboardData?.daily_average?.trend === 'up' ? '↑' : '↓'}
+                  </span>
+                  {dashboardData?.daily_average?.percentage_change || "0"}% vs yesterday
                 </div>
               </div>
             </CardContent>
@@ -63,15 +128,30 @@ export default function HomeScreen() {
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-gray-900 text-base">Daily Challenge</h3>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
-                      Active
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      dailyChallenge ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {dailyChallenge ? 'Active' : 'None'}
                     </span>
                     <ChevronRight className="h-4 w-4 text-gray-400" />
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">Use electronics less than 20 kWh</p>
-                <Progress value={75} className="h-2 mb-2" />
-                <p className="text-xs text-gray-500">3/4 completed</p>
+                <p className="text-sm text-gray-600 mb-3">
+                  {dailyChallenge ? dailyChallenge.challenge_description : "No active challenge"}
+                </p>
+                {dailyChallenge && (
+                  <>
+                    <Progress 
+                      value={dailyChallenge.milestone_progress[0] ? 
+                        (dailyChallenge.current_progress / dailyChallenge.milestone_progress[0].target) * 100 : 0
+                      } 
+                      className="h-2 mb-2" 
+                    />
+                    <p className="text-xs text-gray-500">
+                      {dailyChallenge.current_progress}/{dailyChallenge.milestone_progress[0]?.target || 0} completed
+                    </p>
+                  </>
+                )}
               </Link>
             </CardContent>
           </Card>
@@ -79,24 +159,36 @@ export default function HomeScreen() {
           {/* Today's Activities */}
           <Card className="border-gray-200 shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold text-gray-900">{"Today's Activities"}</CardTitle>
+              <CardTitle className="text-base font-semibold text-gray-900">{"Recent Activities"}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-2">
-                {activities.map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm`}>
-                        <activity.icon className={`h-4 w-4 ${activity.color}`} />
+                {isLoading ? (
+                  <p className="text-sm text-gray-500 text-center py-4">Loading activities...</p>
+                ) : activities.length > 0 ? (
+                  activities.map((activity, index) => {
+                    const IconComponent = getActivityIcon(activity.source)
+                    const colorClass = getActivityColor(activity.source)
+                    return (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm`}>
+                            <IconComponent className={`h-4 w-4 ${colorClass}`} />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 text-sm capitalize">{activity.source}</p>
+                            <p className="text-xs text-gray-500">{activity.deskripsi}</p>
+                          </div>
+                        </div>
+                        <span className={`font-semibold ${colorClass} text-sm`}>
+                          +{activity.carbon_output?.toFixed(1) || "0.0"} kg
+                        </span>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900 text-sm">{activity.label}</p>
-                        <p className="text-xs text-gray-500">{activity.detail}</p>
-                      </div>
-                    </div>
-                    <span className={`font-semibold ${activity.color} text-sm`}>{activity.impact}</span>
-                  </div>
-                ))}
+                    )
+                  })
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">No activities yet</p>
+                )}
               </div>
             </CardContent>
           </Card>
