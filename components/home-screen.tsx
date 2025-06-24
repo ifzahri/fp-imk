@@ -115,7 +115,7 @@ export default function HomeScreen() {
                   <span className="mr-1">
                     {dashboardData?.daily_average?.trend === 'up' ? '↑' : '↓'}
                   </span>
-                  {dashboardData?.daily_average?.percentage_change || "0"}% vs yesterday
+                  {dashboardData?.daily_average?.percentage_change.toFixed(2)|| "0"}% vs yesterday
                 </div>
               </div>
             </CardContent>
@@ -191,7 +191,7 @@ export default function HomeScreen() {
                           </div>
                         </div>
                         <span className={`font-semibold ${colorClass} text-sm`}>
-                          +{activity.carbon_output?.toFixed(1) || "0.0"} kg
+                          +{activity.carbon_estimate?.toFixed(1) || "0.0"} kg
                         </span>
                       </Link>
                     )

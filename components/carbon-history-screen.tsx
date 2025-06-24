@@ -162,7 +162,7 @@ export default function CarbonHistoryScreen() {
                   <span className="text-xs text-gray-500">
                     {groupedEntries[date]
                       .reduce((total: number, entry: ActivityResponse) => {
-                        return total + entry.carbon_output
+                        return total + entry.carbon_estimate
                       }, 0)
                       .toFixed(1)}{" "}
                     kg CO₂
@@ -186,7 +186,7 @@ export default function CarbonHistoryScreen() {
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-gray-900 text-sm">{entry.source}</p>
                                 <p className="text-xs text-gray-500 truncate">{entry.deskripsi}</p>
-                                <p className="text-sm font-semibold text-orange-500">{entry.carbon_output.toFixed(1)} kg CO₂</p>
+                                <p className="text-sm font-semibold text-orange-500">{entry.carbon_estimate.toFixed(1)} kg CO₂</p>
                               </div>
                             </div>
                             <div className="flex flex-col items-end justify-between h-full ml-2">

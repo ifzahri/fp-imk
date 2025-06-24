@@ -59,25 +59,32 @@ export default function BadgesScreen() {
 
         // Handle user badges response
         if (userBadgesResult.status) {
-          let userBadgesData: BadgeResponse[]
-          if (Array.isArray(userBadgesResult.data)) {
+          let userBadgesData: BadgeResponse[] = []
+          if (userBadgesResult.data === null || userBadgesResult.data === undefined) {
+            userBadgesData = [] // Data is explicitly null or undefined
+          } else if (Array.isArray(userBadgesResult.data)) {
             userBadgesData = userBadgesResult.data
           } else {
+            // Assume it's NestedBadgesPayload
             userBadgesData = (userBadgesResult.data as NestedBadgesPayload).badges || []
           }
           setUserBadges(userBadgesData)
         } else {
-          // If user badges fail to load, default to empty (all badges will appear locked)
+          // If user badges fail to load (status is false), default to empty
           console.warn("Could not load user badges:", userBadgesResult.message)
           setUserBadges([])
         }
 
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Badges fetch error:", err)
-        if (err.type === "all") {
+        if (typeof err === "object" && err !== null && "type" in err && err.type === "all") {
           setError("Failed to load badge list. Please try again.")
+        } else if (typeof err === "object" && err !== null && "response" in err && typeof err.response === "object" && err.response !== null && "data" in err.response && typeof err.response.data === "object" && err.response.data !== null && "message" in err.response.data && typeof err.response.data.message === "string") {
+          setError(err.response.data.message)
+        } else if (err instanceof Error) {
+          setError(err.message)
         } else {
-          setError(err?.response?.data?.message || err.message || "Failed to load badges")
+          setError("Failed to load badges")
         }
       } finally {
         setIsLoading(false)
