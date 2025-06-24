@@ -6,24 +6,22 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Bell, Home, BarChart3, Plus, Award, User, ChevronDown, ArrowUpRight, ArrowDownRight } from "lucide-react"
 import Link from "next/link"
 import { getCarbonDashboard } from "@/lib/api"
-import { CarbonDashboardResponse } from "@/types/types"
+import { CarbonDashboardResponse, TrendData } from "@/types/types"
 
 export default function AnalyticsScreen() {
-  const [activeTab, setActiveTab] = useState("analytics")
-  const [timeframe, setTimeframe] = useState("6_months")
+  const [timeframe, setTimeframe] = useState("6m")
   const [timeframeLabel, setTimeframeLabel] = useState("Last 6 months")
   const [dashboardData, setDashboardData] = useState<CarbonDashboardResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingTrend, setIsLoadingTrend] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [showTimeframeDropdown, setShowTimeframeDropdown] = useState(false)
 
   const timeframeOptions = [
-    { value: "7_days", label: "Last 7 days" },
-    { value: "1_month", label: "Last 1 month" },
-    { value: "3_months", label: "Last 3 months" },
-    { value: "6_months", label: "Last 6 months" },
-    { value: "1_year", label: "Last 1 year" }
+    { value: "7d", label: "Last 7 days" },
+    { value: "1m", label: "Last 1 month" },
+    { value: "3m", label: "Last 3 months" },
+    { value: "6m", label: "Last 6 months" },
+    { value: "1y", label: "Last 1 year" }
   ]
 
   const fetchDashboardData = async (selectedTimeframe?: string) => {
@@ -40,11 +38,14 @@ export default function AnalyticsScreen() {
       if (result.status) {
         setDashboardData(result.data)
       } else {
-        setError(result.message || "Failed to fetch dashboard data")
+        console.error(result.message || "Failed to fetch dashboard data")
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "An error occurred while fetching data")
-      console.error("Dashboard fetch error:", err)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Dashboard fetch error:", err.message)
+      } else {
+        console.error("An unknown error occurred while fetching data")
+      }
     } finally {
       setIsLoading(false)
       setIsLoadingTrend(false)
@@ -67,7 +68,7 @@ export default function AnalyticsScreen() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = () => {
       if (showTimeframeDropdown) {
         setShowTimeframeDropdown(false)
       }
@@ -198,8 +199,8 @@ export default function AnalyticsScreen() {
                     <p className="text-gray-500 text-sm">Loading trend data...</p>
                   </div>
                 ) : (() => {
-                  const trendData = dashboardData?.carbon_trend?.[timeframe];
-                  return trendData && trendData.length > 0 ? (
+                  const data: TrendData[] = dashboardData?.carbon_trend || [];
+                  return data.length > 0 ? (
                     <div className="h-40">
                       {/* Simple Line Chart */}
                       <div className="relative h-full">
@@ -214,7 +215,6 @@ export default function AnalyticsScreen() {
                           
                           {/* Trend line */}
                           {(() => {
-                            const data = trendData;
                             const maxValue = Math.max(...data.map(d => d.value));
                             const minValue = Math.min(...data.map(d => d.value));
                             const range = maxValue - minValue || 1;
@@ -266,7 +266,7 @@ export default function AnalyticsScreen() {
                                         fontSize={data.length > 7 ? "8" : "10"}
                                         fill="#6b7280"
                                       >
-                                        {point.label}
+                                        {point.month}
                                       </text>
                                       {/* Value labels on hover */}
                                       <text

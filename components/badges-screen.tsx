@@ -8,6 +8,15 @@ import { getUserBadges, getAllBadges } from "@/lib/api"
 import { getUserIdFromJwt } from "@/lib/utils"
 import { BadgeResponse } from "@/types/types"
 
+// Interface for handling nested badge responses
+interface NestedBadgesPayload {
+  badges: BadgeResponse[]
+  page?: number
+  per_page?: number
+  max_page?: number
+  count?: number
+}
+
 export default function BadgesScreen() {
   const [userBadges, setUserBadges] = useState<BadgeResponse[]>([])
   const [allBadges, setAllBadges] = useState<BadgeResponse[]>([])
@@ -18,25 +27,58 @@ export default function BadgesScreen() {
     const fetchBadges = async () => {
       try {
         setIsLoading(true)
+        setError(null)
         
-        // Fetch all badges
-        const allBadgesResult = await getAllBadges()
-        if (allBadgesResult.status) {
-          setAllBadges(allBadgesResult.data)
+        // Get user ID from JWT (may be null if not logged in)
+        const userId = getUserIdFromJwt()
+
+        // Fetch both all badges and user badges concurrently
+        const [allBadgesResult, userBadgesResult] = await Promise.all([
+          getAllBadges().catch(e => { throw { type: "all", error: e } }),
+          userId 
+            ? getUserBadges(userId).catch(e => { 
+                console.warn("Could not load user badges, defaulting to none:", e)
+                return { status: true, message: "", data: [] }
+              })
+            : Promise.resolve({ status: true, message: "", data: [] })
+        ])
+
+        // Handle all badges response
+        if (!allBadgesResult.status) {
+          throw new Error(`Could not load badges: ${allBadgesResult.message}`)
         }
 
-        // Fetch user's badges
-        const userId = getUserIdFromJwt()
-        if (userId) {
-          const userBadgesResult = await getUserBadges(userId)
-          if (userBadgesResult.status) {
-            setUserBadges(userBadgesResult.data)
+        // Support both flat array and nested response structures
+        let allBadgesData: BadgeResponse[]
+        if (Array.isArray(allBadgesResult.data)) {
+          allBadgesData = allBadgesResult.data
+        } else {
+          allBadgesData = (allBadgesResult.data as NestedBadgesPayload).badges || []
+        }
+        setAllBadges(allBadgesData)
+
+        // Handle user badges response
+        if (userBadgesResult.status) {
+          let userBadgesData: BadgeResponse[]
+          if (Array.isArray(userBadgesResult.data)) {
+            userBadgesData = userBadgesResult.data
+          } else {
+            userBadgesData = (userBadgesResult.data as NestedBadgesPayload).badges || []
           }
+          setUserBadges(userBadgesData)
+        } else {
+          // If user badges fail to load, default to empty (all badges will appear locked)
+          console.warn("Could not load user badges:", userBadgesResult.message)
+          setUserBadges([])
         }
 
       } catch (err: any) {
-        setError(err?.response?.data?.message || "Failed to load badges")
         console.error("Badges fetch error:", err)
+        if (err.type === "all") {
+          setError("Failed to load badge list. Please try again.")
+        } else {
+          setError(err?.response?.data?.message || err.message || "Failed to load badges")
+        }
       } finally {
         setIsLoading(false)
       }
@@ -120,6 +162,8 @@ export default function BadgesScreen() {
   const isUserBadge = (badgeId: string) => {
     return userBadges.some(userBadge => userBadge.id === badgeId)
   }
+
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm h-[100vh] bg-white rounded-lg shadow-lg overflow-hidden relative">
@@ -142,19 +186,57 @@ export default function BadgesScreen() {
             <h2 className="text-xl font-semibold text-gray-900">Your Achievements</h2>
             <div className="text-sm text-gray-500">
               {userBadges.length}/{allBadges.length} earned
+              {!getUserIdFromJwt() && (
+                <div className="text-xs text-amber-600 mt-1">
+                  Login to unlock badges
+                </div>
+              )}
             </div>
           </div>
 
           {isLoading ? (
             <div className="text-center py-8">
+              <div className="animate-pulse">
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="flex flex-col items-center">
+                      <div className="w-16 h-16 bg-gray-200 rounded-full mb-2"></div>
+                      <div className="w-12 h-3 bg-gray-200 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <p className="text-gray-500">Loading badges...</p>
             </div>
           ) : error ? (
             <div className="text-center py-8">
-              <p className="text-red-500 mb-4">{error}</p>
-              <Button onClick={() => window.location.reload()} variant="outline">
+              <div className="mb-4">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Award className="h-8 w-8 text-red-400" />
+                </div>
+                <p className="text-red-600 font-medium mb-2">Oops! Something went wrong</p>
+                <p className="text-gray-500 text-sm">{error}</p>
+              </div>
+              <Button 
+                onClick={() => {
+                  setError(null)
+                  setIsLoading(true)
+                  // Trigger re-fetch by updating a dependency
+                  window.location.reload()
+                }} 
+                variant="outline"
+                className="text-emerald-600 border-emerald-600 hover:bg-emerald-50"
+              >
                 Try Again
               </Button>
+            </div>
+          ) : allBadges.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Award className="h-8 w-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500">No badges available yet</p>
+              <p className="text-gray-400 text-sm mt-1">Check back later for new achievements!</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-4">

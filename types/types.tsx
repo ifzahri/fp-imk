@@ -30,9 +30,7 @@ export interface LoginResponse {
 export interface CarbonDashboardResponse {
   daily_average: DailyAverageData;
   monthly_average: MonthlyAverageData;
-  carbon_trend: {
-    [key: string]: TrendData[];
-  };
+  carbon_trend: TrendData[];
   emission_sources: EmissionSource[];
 }
 
@@ -51,7 +49,7 @@ export interface MonthlyAverageData {
 }
 
 export interface TrendData {
-  label: string;
+  month: string;
   value: number;
 }
 

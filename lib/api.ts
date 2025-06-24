@@ -57,7 +57,7 @@ export interface CarbonEntryData {
 }
 
 export const addActivity = async (entry: CarbonEntryData) => {
-  const response = await api.post<APIResponse<ActivityResponse>>('/activity', entry)
+  const response = await api.post<APIResponse<ActivityResponse>>('/activity/', entry)
   return response.data
 }
 
@@ -127,7 +127,7 @@ export const getBadgeById = async (id: string) => {
 }
 
 export const getAllBadges = async () => {
-  const response = await api.get<APIResponse<BadgeResponse[]>>('/badge')
+  const response = await api.get<APIResponse<BadgeResponse[]>>('/badge/')
   return response.data
 }
 

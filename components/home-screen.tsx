@@ -156,10 +156,16 @@ export default function HomeScreen() {
             </CardContent>
           </Card>
 
-          {/* Today's Activities */}
+          {/* Recent Activities */}
           <Card className="border-gray-200 shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold text-gray-900">{"Recent Activities"}</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold text-gray-900">Recent Activities</CardTitle>
+                <Link href="/carbon-history" className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+                  View all
+                  <ChevronRight className="h-3 w-3" />
+                </Link>
+              </div>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-2">
@@ -170,7 +176,11 @@ export default function HomeScreen() {
                     const IconComponent = getActivityIcon(activity.source)
                     const colorClass = getActivityColor(activity.source)
                     return (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <Link
+                        key={index}
+                        href="/carbon-history"
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      >
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm`}>
                             <IconComponent className={`h-4 w-4 ${colorClass}`} />
@@ -183,11 +193,19 @@ export default function HomeScreen() {
                         <span className={`font-semibold ${colorClass} text-sm`}>
                           +{activity.carbon_output?.toFixed(1) || "0.0"} kg
                         </span>
-                      </div>
+                      </Link>
                     )
                   })
                 ) : (
-                  <p className="text-sm text-gray-500 text-center py-4">No activities yet</p>
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-500 mb-2">No activities yet</p>
+                    <Link 
+                      href="/add" 
+                      className="text-xs text-emerald-600 hover:text-emerald-700 underline"
+                    >
+                      Start tracking your carbon footprint
+                    </Link>
+                  </div>
                 )}
               </div>
             </CardContent>
