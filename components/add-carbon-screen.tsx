@@ -9,6 +9,7 @@ import { ArrowLeft, Car, Zap, UtensilsCrossed, Calendar } from "lucide-react" //
 import { useRouter } from "next/navigation"
 import { addCarbonEntry } from "@/lib/api"; // Removed unused CarbonEntryData import
 import { getUserIdFromJwt } from "@/lib/utils"; // Assuming this helper exists
+import toast from "react-hot-toast"
 
 export default function AddCarbonScreen() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function AddCarbonScreen() {
       const userId = getUserIdFromJwt(); // Get user ID from JWT
 
       if (!userId) {
-        alert("User not authenticated.");
+        toast.error("User not authenticated.");
         setIsSaving(false);
         return;
       }
@@ -111,21 +112,21 @@ export default function AddCarbonScreen() {
           }
         };
       } else {
-        alert("Invalid category selected.");
+        toast.error("Invalid category selected.");
         setIsSaving(false);
         return;
       }
 
       const result = await addCarbonEntry(entryData);
       if (result.status) {
-        alert(result.message); // Or use a more sophisticated notification
+        toast.success(result.message); // Or use a more sophisticated notification
         router.push("/home");
       } else {
-        alert(result.message || "Failed to save carbon entry.");
+        toast.error(result.message || "Failed to save carbon entry.");
       }
     } catch (error: any) { // TODO: Refine error type
       console.error("Failed to save carbon entry:", error);
-      alert(error?.response?.data?.message || "An error occurred while saving the entry.");
+      toast.error(error?.response?.data?.message || "An error occurred while saving the entry.");
     } finally {
       setIsSaving(false);
     }

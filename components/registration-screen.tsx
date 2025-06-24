@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { registerUser } from "@/lib/api"
+import toast from "react-hot-toast"
 
 export default function RegistrationScreen() {
   const router = useRouter()
@@ -35,13 +36,13 @@ export default function RegistrationScreen() {
 
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!")
+      toast.error("Passwords don't match!")
       setIsLoading(false)
       return
     }
 
     if (!formData.name || !formData.email || !formData.password) {
-      alert("Please fill in all fields!")
+      toast.error("Please fill in all fields!")
       setIsLoading(false)
       return
     }
@@ -49,14 +50,14 @@ export default function RegistrationScreen() {
     try {
       const result = await registerUser(formData.name, formData.email, formData.password, formData.telp_number);
       if (result.status) {
-        alert("Registration successful! Please log in.");
+        toast.success("Registration successful! Please log in.");
         router.push("/login");
       } else {
-        alert(result.message || "Registration failed.");
+        toast.error(result.message || "Registration failed.");
       }
     } catch (error: any) {
       console.error("Registration failed:", error);
-      alert(error?.response?.data?.message || "An unexpected error occurred. Please try again.");
+      toast.error(error?.response?.data?.message || "An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false)
     }

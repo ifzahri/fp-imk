@@ -11,6 +11,7 @@ import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { loginUser } from "@/lib/api"
 import { useAuthStore } from "@/stores/auth"
+import toast from "react-hot-toast"
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -37,10 +38,10 @@ const handleLogin = async () => {
       setAuth({ token: result.data.token, role: result.data.role, user: result.data.user })
       router.push("/home")
     } else {
-      alert(result.message)
+      toast.error(result.message)
     }
   } catch (error: any) {
-    alert(error?.response?.data?.message || "Login failed.")
+    toast.error(error?.response?.data?.message || "Login failed.")
   } finally {
     setIsLoading(false)
   }

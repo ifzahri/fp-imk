@@ -8,6 +8,7 @@ import { ArrowLeft, CheckCircle, Clock, XCircle } from "lucide-react"
 import Link from "next/link"
 import { getUserDailyChallenge, updateUserChallengeProgress } from "@/lib/api"
 import { UserChallengeResponse } from "@/types/types"
+import toast from "react-hot-toast"
 
 export default function DailyChallengeScreen() {
   const [challenge, setChallenge] = useState<UserChallengeResponse | null>(null)
@@ -44,11 +45,12 @@ export default function DailyChallengeScreen() {
       const result = await updateUserChallengeProgress(challenge.challenge_id, newProgress)
       if (result.status) {
         setChallenge(result.data)
+        toast.success("Progress updated successfully!")
       } else {
-        alert(result.message || "Failed to update progress")
+        toast.error(result.message || "Failed to update progress")
       }
     } catch (err: any) {
-      alert(err?.response?.data?.message || "Failed to update progress")
+      toast.error(err?.response?.data?.message || "Failed to update progress")
       console.error("Progress update error:", err)
     } finally {
       setIsUpdating(false)

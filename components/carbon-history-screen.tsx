@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query"
 import { getActivitiesByUser, deleteActivity } from "@/lib/api"
 import { useAuthStore } from "@/stores/auth"
 import { ActivityResponse } from "@/types/types"
+import toast from "react-hot-toast"
 
 export default function CarbonHistoryScreen() {
   const router = useRouter()
@@ -58,9 +59,10 @@ export default function CarbonHistoryScreen() {
       try {
         await deleteActivity(entryId)
         refetch() // Re-fetch data after successful deletion
+        toast.success("Activity deleted successfully!")
       } catch (error) {
         console.error("Failed to delete activity:", error)
-        alert("Failed to delete activity. Please try again.")
+        toast.error("Failed to delete activity. Please try again.")
       }
     }
   }
