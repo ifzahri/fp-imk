@@ -10,7 +10,7 @@ import { CarbonDashboardResponse, TrendData } from "@/types/types"
 
 export default function AnalyticsScreen() {
   const [timeframe, setTimeframe] = useState("6m")
-  const [timeframeLabel, setTimeframeLabel] = useState("Last 6 months")
+  const [timeframeLabel, setTimeframeLabel] = useState("Last 7 days")
   const [dashboardData, setDashboardData] = useState<CarbonDashboardResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingTrend, setIsLoadingTrend] = useState(false)
@@ -401,7 +401,6 @@ export default function AnalyticsScreen() {
                             {changeIcon}{source.percentage_change.toFixed(1)}%
                           </p>
                         </div>
-                        <ChevronDown className="h-4 w-4 text-gray-400 rotate-[-90deg]" />
                       </div>
                     </div>
                   </div>
@@ -416,7 +415,7 @@ export default function AnalyticsScreen() {
         </div>
 
         {/* Navigation Bar */}
-        <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 w-full z-10">
           <div className="flex items-center justify-around py-3 px-4">
             <Link href="/home">
               <Button

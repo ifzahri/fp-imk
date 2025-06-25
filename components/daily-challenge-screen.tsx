@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -117,17 +118,14 @@ export default function DailyChallengeScreen() {
                 <CardContent className="text-center space-y-3 pt-0">
                   <p className="text-sm text-gray-600">{challenge.challenge_description}</p>
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
-                      {challenge.duration_days} days
-                    </span>
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                      Save {challenge.carbon_saving_estimate} kg CO₂
-                    </span>
+                    {/* <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                      Save {challenge.current_progress} kg CO₂
+                    </span> */}
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Overall Progress Card */}
+              {/* Overall Progress Card
               <Card className="border-gray-200 shadow-lg">
                 <CardHeader className="text-center pb-3">
                   <CardTitle className="text-base font-semibold text-gray-900">Overall Progress</CardTitle>
@@ -153,44 +151,7 @@ export default function DailyChallengeScreen() {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
-
-              {/* Milestones */}
-              <div className="space-y-3">
-                <h3 className="font-semibold text-gray-900">Milestones</h3>
-                {challenge.milestone_progress.map((milestone, index) => (
-                  <Card key={index} className={`border-2 ${getStatusColor(milestone.is_achieved)} shadow-lg`}>
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-gray-900 text-sm">Milestone {index + 1}</h4>
-                          {getStatusIcon(milestone.is_achieved)}
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
-                            <div
-                              className={`h-full transition-all duration-300 ease-in-out ${getProgressColor(milestone.is_achieved)}`}
-                              style={{ 
-                                width: `${Math.min((challenge.current_progress / milestone.target) * 100, 100)}%` 
-                              }}
-                            />
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-600 font-medium">Target: {milestone.target}</span>
-                            <span className="text-xs text-gray-600 font-medium">
-                              Progress: {Math.min(challenge.current_progress, milestone.target)}/{milestone.target}
-                            </span>
-                          </div>
-                          {milestone.reward && (
-                            <p className="text-xs text-gray-500">Reward: {milestone.reward}</p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              </Card> */}
             </>
           ) : (
             <div className="text-center py-8">

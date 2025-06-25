@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -113,7 +115,7 @@ export default function HomeScreen() {
                 </div>
                 <div className="flex items-center text-sm opacity-90">
                   <span className="mr-1">
-                    {dashboardData?.daily_average?.trend === 'up' ? '↑' : '↓'}
+                    {dashboardData?.daily_average?.comparison_period === 'up' ? '↓' : '↑'}
                   </span>
                   {dashboardData?.daily_average?.percentage_change.toFixed(2)|| "0"}% vs yesterday
                 </div>
@@ -139,7 +141,7 @@ export default function HomeScreen() {
                 <p className="text-sm text-gray-600 mb-3">
                   {dailyChallenge ? dailyChallenge.challenge_description : "No active challenge"}
                 </p>
-                {dailyChallenge && (
+                {/* {dailyChallenge && (
                   <>
                     <Progress 
                       value={dailyChallenge.milestone_progress[0] ? 
@@ -151,7 +153,7 @@ export default function HomeScreen() {
                       {dailyChallenge.current_progress}/{dailyChallenge.milestone_progress[0]?.target || 0} completed
                     </p>
                   </>
-                )}
+                )} */}
               </Link>
             </CardContent>
           </Card>
@@ -213,7 +215,7 @@ export default function HomeScreen() {
         </div>
 
         {/* Navigation Bar */}
-        <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 w-full z-10">
           <div className="flex items-center justify-around py-3 px-4">
             <Button
               variant="ghost"

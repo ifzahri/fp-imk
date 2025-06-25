@@ -29,7 +29,7 @@ export default function ProfileScreen() {
           if (profileData && profileData.data) {
             setUser(profileData.data);
           } else if (profileData) {
-            setUser(profileData);
+            setUser(profileData.data);
           }
         } catch (error) {
           console.error("Failed to fetch user profile:", error);
@@ -117,7 +117,7 @@ export default function ProfileScreen() {
         </div>
 
         {/* Navigation Bar */}
-        <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 w-full z-10">
           <div className="flex items-center justify-around py-3 px-4">
             <Link href="/home">
               <Button

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -27,6 +28,9 @@ export default function AddCarbonScreen() {
     foodItem: "",
     weight: "",
   })
+
+  const electronicsItems = ["AC", "Lamp", "Fridge", "Fan"];
+  const foodItems = ["Rice", "Beef", "Chicken", "Vegetable", "Egg"];
 
   const categories = [
     { id: "vehicle", label: "Vehicle", icon: Car },
@@ -223,35 +227,6 @@ export default function AddCarbonScreen() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="date" className="text-gray-700 font-medium">
-                  Date
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    className="h-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
-                  />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes" className="text-gray-700 font-medium">
-                  Notes (Optional)
-                </Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Add any additional notes..."
-                  value={formData.notes}
-                  onChange={(e) => handleInputChange("notes", e.target.value)}
-                  className="min-h-[80px] border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500 resize-none"
-                />
-              </div>
-
               {/* Description Field */}
               <div className="space-y-2">
                 <Label htmlFor="deskripsi" className="text-gray-700 font-medium">
@@ -275,14 +250,18 @@ export default function AddCarbonScreen() {
                 <Label htmlFor="electronicsItem" className="text-gray-700 font-medium">
                   Item
                 </Label>
-                <Input
+                <select
                   id="electronicsItem"
-                  type="text"
-                  placeholder="e.g., Laptop, Refrigerator"
                   value={formData.electronicsItem}
                   onChange={(e) => handleInputChange("electronicsItem", e.target.value)}
-                  className="h-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
-                />
+                  className="w-full h-12 px-3 border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  {electronicsItems.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="durationUsage" className="text-gray-700 font-medium">
@@ -298,21 +277,6 @@ export default function AddCarbonScreen() {
                     className="h-12 pr-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">hours</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="date" className="text-gray-700 font-medium">
-                  Date
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    className="h-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
-                  />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -337,14 +301,18 @@ export default function AddCarbonScreen() {
                 <Label htmlFor="foodItem" className="text-gray-700 font-medium">
                   Food Item
                 </Label>
-                <Input
+                <select
                   id="foodItem"
-                  type="text"
-                  placeholder="e.g., Organic, Meat, Dairy"
                   value={formData.foodItem}
                   onChange={(e) => handleInputChange("foodItem", e.target.value)}
-                  className="h-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
-                />
+                  className="w-full h-12 px-3 border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  {foodItems.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="weight" className="text-gray-700 font-medium">
@@ -360,21 +328,6 @@ export default function AddCarbonScreen() {
                     className="h-12 pr-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">kg</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="date" className="text-gray-700 font-medium">
-                  Date
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    className="h-12 border-gray-200 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500"
-                  />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 </div>
               </div>
               <div className="space-y-2">

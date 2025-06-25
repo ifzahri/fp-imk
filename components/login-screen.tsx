@@ -107,11 +107,11 @@ const handleLogin = async () => {
             </div>
           </div>
 
-          <div className="text-right">
+          {/* <div className="text-right">
             <Link href="/forgot-password" className="text-sm text-blue-500 hover:text-blue-600 hover:underline">
               Forgot Password
             </Link>
-          </div>
+          </div> */}
 
           <Button
             onClick={handleLogin}
@@ -130,7 +130,7 @@ const handleLogin = async () => {
             </div>
           </div>
 
-          <Button
+          {/* <Button
             onClick={handleGoogleLogin}
             disabled={isLoading}
             variant="outline"
@@ -155,7 +155,7 @@ const handleLogin = async () => {
               />
             </svg>
             {isLoading ? "Please wait..." : "Continue with Google"}
-          </Button>
+          </Button> */}
 
           <div className="text-center text-sm text-gray-600 mt-6">
             {"Don't have an account? "}
